@@ -23,7 +23,7 @@ def extraer_lineas_productos(texto):
                     "Producto": descripcion,
                     "Cantidad": cantidad,
                     "Precio Unitario": precio,
-                    "Dimensiones": tuple(sorted(map(int, match.group(1).split('x'))))
+                    "Dimensiones": tuple(sorted(map(lambda x: float(x.replace(',', '.')), match.group(1).lower().split('x'))))
                 })
     return productos
 
