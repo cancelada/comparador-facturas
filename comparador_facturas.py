@@ -9,7 +9,8 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 
 # Función para extraer líneas de productos de texto directo
 def extraer_lineas_productos(texto):
-    lineas = texto.split('\n')
+    lineas = texto.split('
+')
     productos = []
     for linea in lineas:
         match = re.search(r'(\d+[xX]\d+[xX]\d+)', linea)
@@ -17,8 +18,13 @@ def extraer_lineas_productos(texto):
             numeros = re.findall(r'\d+(?:[.,]\d+)?', linea)
             if len(numeros) >= 2:
                 descripcion = linea.strip()
-                cantidad = float(numeros[-2].replace(',', '.'))
-                precio = float(numeros[-1].replace(',', '.'))
+                for i in range(len(numeros) - 1):
+                    cantidad_cand = float(numeros[i].replace(',', '.'))
+                    precio_cand = float(numeros[i+1].replace(',', '.'))
+                    if 0 < precio_cand < 1000:  # Filtro razonable para precio unitario
+                        cantidad = cantidad_cand
+                        precio = precio_cand
+                        break
                 productos.append({
                     "Producto": descripcion,
                     "Cantidad": cantidad,
