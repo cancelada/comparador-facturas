@@ -1,13 +1,13 @@
 import streamlit as st
 import pandas as pd
-from pdf2image import convert_from_bytes
-from PIL import Image
+import fitz  # PyMuPDF
 import re
 from io import BytesIO
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill
+from openpyxl.utils.dataframe import dataframe_to_rows
 
-# Función para extraer líneas de productos de texto (PDF con texto, no OCR)
+# Función para extraer líneas de productos de texto directo
 def extraer_lineas_productos(texto):
     lineas = texto.split('\n')
     productos = []
@@ -76,15 +76,14 @@ def comparar_factura_pedido(factura_df, pedido_df):
     return pd.DataFrame(resultados)
 
 # Interfaz Streamlit
-st.title("Comparador de Facturas y Pedidos")
+st.title("Comparador de Facturas y Pedidos (PDF con texto)")
 
-archivo = st.file_uploader("Sube un PDF (con texto, no imagen escaneada)", type=["pdf"])
+archivo = st.file_uploader("Sube un PDF (con texto reconocible, no imagen)", type=["pdf"])
 if archivo:
-    imagenes = convert_from_bytes(archivo.read(), dpi=200)
     texto_total = ""
-    for imagen in imagenes:
-        texto = imagen.convert("L").tobytes()
-        texto_total += imagen.convert("L").tobytes().decode(errors='ignore') + "\n"
+    with fitz.open(stream=archivo.read(), filetype="pdf") as doc:
+        for page in doc:
+            texto_total += page.get_text() + "\n"
 
     productos = extraer_lineas_productos(texto_total)
     df = pd.DataFrame(productos)
@@ -108,7 +107,6 @@ if archivo:
         wb = Workbook()
         ws = wb.active
         ws.title = "Comparativa"
-        from openpyxl.utils.dataframe import dataframe_to_rows
         for r in dataframe_to_rows(resultado, index=False, header=True):
             ws.append(r)
 
@@ -130,4 +128,4 @@ if archivo:
         wb.save(output)
         st.download_button("Descargar Excel", data=output.getvalue(), file_name="Comparativa.xlsx")
     else:
-        st.warning("No se detectaron líneas válidas en el documento.")
+        st.warning("No se detectaron líneas válidas. Verifica que el PDF tenga texto seleccionable.")

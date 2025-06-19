@@ -1,21 +1,14 @@
 # Comparador de Facturas y Pedidos
 
-Aplicación web desarrollada con Streamlit para comparar líneas de productos entre una factura y un pedido, a partir de un archivo PDF que contenga texto (no imagen escaneada).
-
-## Características
-
-- Extrae productos, cantidades, precios unitarios y dimensiones.
-- Agrupa por dimensión.
-- Compara las líneas entre factura y pedido.
-- Genera un archivo Excel resaltando las diferencias.
-
-## Uso
-
-1. Sube el PDF con las líneas de factura y pedido (en texto).
-2. La app detecta y compara los datos.
-3. Descarga el Excel generado.
+Esta aplicación desarrollada en Streamlit permite comparar productos de una factura con los productos pedidos en un archivo PDF con texto OCR reconocido.
 
 ## Requisitos
 
-- El PDF debe contener texto seleccionable (no imagen).
-- Puedes desplegar esta app en [Streamlit Cloud](https://streamlit.io/cloud).
+- El archivo PDF debe tener texto seleccionable.
+- No se aceptan PDFs escaneados como imágenes (sin OCR).
+
+## Uso
+
+1. Suba un PDF con líneas de productos de factura y pedido.
+2. El sistema extrae las líneas y compara cantidades y precios por dimensiones.
+3. Se muestra el resultado y permite descargar un Excel coloreado con diferencias.
